@@ -1,0 +1,13 @@
+.root {
+  .age-error, .prev-error {
+    border: 1px solid red;
+  }
+  ul {
+    width: 550px;
+  }
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

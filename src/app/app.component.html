@@ -1,16 +1,24 @@
 <div>
   <h1>Async worker validator demo</h1>
+  <code>
+    {{errors | json}}
+  </code>
   <form novalidate>
     <ul>
+      <li>
+        <span>name</span>
+        <span>days</span>
+        <span>age</span>
+      </li>
       <ng-container *ngFor="let rule of rules">
-        <li>
+        <li [ngClass]="{
+          'age-error': rule.get('age').hasError('max')
+        }">
           <input type="text" [formControl]="rule.get('name')">
-          <input type="text" [formControl]="rule.get('days')">
+          <input [class.prev-error]="rule.get('days').hasError('prev')" type="text" [formControl]="rule.get('days')">
+          <input type="number" [formControl]="rule.get('age')">
         </li>
       </ng-container>
     </ul>
   </form>
-  <code>
-    {{errors | json}}
-  </code>
 </div>
