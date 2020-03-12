@@ -2,10 +2,7 @@
 import {ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {WorkerService} from './worker.service';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {WorkerValidator} from './model/worker-validator';
-import {Tags} from './model/worker/actions';
-import {map, mergeMap, share, tap} from 'rxjs/operators';
-import {User} from './model/users';
+import {share} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +15,16 @@ import {User} from './model/users';
   }
 })
 export class AppComponent implements OnInit {
-  form = this.fb.group({});
+  form = this.fb.group({
+    rules: this.fb.array([])
+  });
 
-  get rules(): FormGroup[] {
-    return (this.form.get('rules') as FormArray).controls as FormGroup[];
+  get rules() {
+    return this.form.get('rules') as FormArray;
+  }
+
+  get rulesControls(): FormGroup[] {
+    return this.rules.controls as FormGroup[];
   }
 
   get errors() {
@@ -35,30 +38,30 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.form.setControl('rules', this.fb.array(
-      Array.from({length: 150}).map((_, i) => this.buildUser(i, this.form)))
-    );
+    const rules$ = this.rules.valueChanges.pipe(share());
 
-    const rules = this.form.get('rules') as FormArray;
-    const rules$ = rules.valueChanges.pipe(share());
+    Array.from({length: 150})
+      .forEach((_, i) => this.rules.push(this.buildUser(i)));
 
-    rules$
-      .pipe(mergeMap(rs => this.worker.sumValidator(new WorkerValidator({
-          tag: Tags.Users,
-          payload: rs
-        }))),
-        map(r => r[Tags.Users])
-      )
-      .subscribe(errors => rules.setErrors(errors));
+    this.rules.setAsyncValidators([
+      () => this.worker.prevValidator(this.form.getRawValue().rules)
+    ]);
   }
 
-  private buildUser(i: number, form: FormGroup) {
+  private buildUser(i: number) {
     return this.fb.group({
       id: [i],
       name: `Name ${i + 1}`,
-      days: this.fb.control(i, null, () => this.worker.prevValidator(form.getRawValue().rules)),
+      days: this.fb.control(i),
       age: this.fb.control(0, Validators.max(100))
     });
+  }
+
+  getError(i: number): boolean {
+    if (this.rules.hasError('prev')) {
+      return (this.rules.getError('prev') as number[]).some(idx => idx === i);
+    }
+    return false;
   }
 }
 

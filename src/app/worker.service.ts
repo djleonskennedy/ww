@@ -18,17 +18,17 @@ export class WorkerService {
     return this._constructWorkerStream('sum', validator.data);
   }
 
-  prevValidator(items: User) {
-    return this._constructWorkerStream('prev', items);
+  prevValidator(payload: User[]) {
+    return this._constructWorkerStream('prev', payload);
   }
 
   private _constructWorkerStream<T>(key: string, dataSource: T) {
     const worker = this.workers.get(key);
     worker.postMessage(dataSource);
-    return new Observable(sub => {
-      worker.onmessage = ({data}) => sub.next(data);
-      worker.onerror = (e: ErrorEvent) => sub.error(e);
-    }).pipe(take(1));
+    return new Promise((resolve, reject) => {
+      worker.onmessage = ({data}) => resolve(data);
+      worker.onerror = (e: ErrorEvent) => reject(e);
+    });
   }
 
   clear() {

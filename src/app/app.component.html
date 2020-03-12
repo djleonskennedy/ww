@@ -10,12 +10,12 @@
         <span>days</span>
         <span>age</span>
       </li>
-      <ng-container *ngFor="let rule of rules">
+      <ng-container *ngFor="let rule of rulesControls; index as i">
         <li [ngClass]="{
           'age-error': rule.get('age').hasError('max')
         }">
           <input type="text" [formControl]="rule.get('name')">
-          <input [class.prev-error]="rule.get('days').hasError('prev')" type="text" [formControl]="rule.get('days')">
+          <input [class.prev-error]="getError(i)" type="text" [formControl]="rule.get('days')">
           <input type="number" [formControl]="rule.get('age')">
         </li>
       </ng-container>
