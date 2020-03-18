@@ -11,15 +11,15 @@ const find = (items: User[], field: string) => {
     const current = items[i];
     const prev = items[i - 1];
     if (i > 0 && prev !== undefined && parseInt(current[field], 10) <= parseInt(prev[field], 10)) {
-      invalid.push(current.id);
+      invalid.push(i);
     }
   }
   return invalid;
 };
 
 const validate = (source) => {
-  const invalidIds = find(source, 'days');
-  return invalidIds.length > 0 ? {prev: invalidIds} : null;
+  const invalidIndexes = find(source, 'days');
+  return invalidIndexes.length > 0 ? {prev: invalidIndexes} : null;
 };
 
 addEventListener('message', ({ data }: {data: {index: number, items: User}}) => {

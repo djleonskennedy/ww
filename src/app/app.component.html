@@ -4,6 +4,9 @@
     {{errors | json}}
   </code>
   <form novalidate>
+    <div class="controls">
+      <button type="button" (click)="addUser()">add</button>
+    </div>
     <ul>
       <li>
         <span>name</span>
@@ -17,6 +20,8 @@
           <input type="text" [formControl]="rule.get('name')">
           <input [class.prev-error]="getError(i)" type="text" [formControl]="rule.get('days')">
           <input type="number" [formControl]="rule.get('age')">
+          <button type="button" (click)="addUser(i)">add</button>
+          <button type="button" (click)="removeUser(i)">remove</button>
         </li>
       </ng-container>
     </ul>

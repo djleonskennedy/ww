@@ -1,22 +1,13 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {WorkerValidator} from './model/worker-validator';
-import {Actions} from './model/worker/actions';
 import {User} from './model/users';
-import {take} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorkerService {
   workers = new Map<string, Worker>([
-    ['sum', new Worker('./workers/app.worker', {type: 'module'})],
     ['prev', new Worker('./workers/find-prev.worker', {type: 'module'})]
   ]);
-
-  sumValidator(validator: WorkerValidator<Actions>) {
-    return this._constructWorkerStream('sum', validator.data);
-  }
 
   prevValidator(payload: User[]) {
     return this._constructWorkerStream('prev', payload);
